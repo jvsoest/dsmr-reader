@@ -7,15 +7,19 @@ from dsmr_parser import obis_references
 import time
 import requests
 
+devicePath = '/dev/ttyUSB1'
 sleepTime = 10
 varsToCollect = ["ELECTRICITY_USED_TARIFF_1", "ELECTRICITY_USED_TARIFF_2", "ELECTRICITY_ACTIVE_TARIFF", "CURRENT_ELECTRICITY_USAGE", "HOURLY_GAS_METER_READING"]
 #varsToCollect = ["P1_MESSAGE_TIMESTAMP", "ELECTRICITY_USED_TARIFF_1", "ELECTRICITY_USED_TARIFF_2", "ELECTRICITY_ACTIVE_TARIFF", "CURRENT_ELECTRICITY_USAGE", "HOURLY_GAS_METER_READING"]
 
-serial_reader = SerialReader(
-    device='/dev/ttyUSB1',
-    serial_settings=SERIAL_SETTINGS_V5,
-    telegram_specification=telegram_specifications.V5
-)
+def connectReader(deviceName):
+    return SerialReader(
+        device=deviceName,
+        serial_settings=SERIAL_SETTINGS_V5,
+        telegram_specification=telegram_specifications.V5
+    )
+
+serial_reader = connectReader(devicePath)
 
 abort = False
 errorCount = 0
@@ -36,7 +40,9 @@ while not abort:
             errorCount = 0
             break
     except:
-        print("Something went wrong when reading meter output")
+        print("Something went wrong when reading meter output, reconnecting meter")
+        serial_reader = None
+        serial_reader = connectReader(devicePath)
         errorCount += 1
     
     # next second of retrieval is always sleepTime + 1 therefore removing 1 second
