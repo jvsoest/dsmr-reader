@@ -1,5 +1,5 @@
 while true
 do 
-    env/bin/python3 run.py
+    python run.py
     sleep 9
 done
