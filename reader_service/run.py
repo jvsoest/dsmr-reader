@@ -6,6 +6,10 @@ from dsmr_parser.clients import SerialReader, SERIAL_SETTINGS_V5
 from dsmr_parser import obis_references
 import time
 import requests
+import os
+
+idbApiPath = os.environ.get("INFLUXDB_API_URI")
+idbName = os.environ.get("INFLUXDB_DB_NAME")
 
 devicePath = '/dev/ttyUSB1'
 sleepTime = 10
@@ -31,7 +35,7 @@ try:
             unit = str(getattr(telegram, attribute).unit)
             #print(attribute + " | " + value)
 
-            resultPost = requests.post("http://localhost:8086/write?db=meterstanden",
+            resultPost = requests.post(f"{idbApiPath}/write?db={idbName}",
                             data="standen,variable=%s,unit=%s value=%s %s" % (attribute, unit, value, timestamp),
                             headers={"Content-Type": "application/x-www-form-urlencoded"})
             #print(str(resultPost.text))
